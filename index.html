@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galery Dump Naura ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="sparkle">✨</div>
+        <h1 class="main-title">GALERY DUMP NAURA</h1>
+        <div class="sparkle">✨</div>
+    </div>
+
+    <div class="description-box">
+        <div class="profile-text">
+            Jadi, Naura adalah... Bocil kelahiran Jakarta tapi malah ngaku orang Bogor, 
+            padahal bagus ya kalau jadi anak Ibukota, dia suka bobo tiap waktu, 
+            dimanapun tempatnya pokonya bobo terus, dia juga jarang makan, 
+            sekarang dia sedang sibuk dengan Stranger Thingsnya 🚲👻
+        </div>
+    </div>
+
+    <div class="month-nav-container" id="monthNav"></div>
+
+    <div class="current-month-title" id="monthTitleDisplay">Desember</div>
+
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Edit Memori 📝</h2>
+            <img id="previewImg" class="modal-img-preview">
+            <button id="btnChooseFile" class="btn-action btn-upload" onclick="document.getElementById('fileInput').click()">📸 Pilih Foto</button>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+            <input type="text" id="captionInput" class="input-caption" placeholder="Tulis caption lucu...">
+            
+            <div id="uploadStatus" style="display:none; color:#ff6b6b; font-size:0.9rem; font-weight:bold; margin-top:5px;">
+                Upload ke Drive... ⏳
+            </div>
+            
+            <div style="margin-top:10px;">
+                <button class="btn-action btn-save" onclick="saveData()">Simpan</button>
+                <button id="btnDelete" class="btn-action btn-delete" onclick="deleteData()" style="display:none;">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

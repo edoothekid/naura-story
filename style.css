@@ -1,0 +1,281 @@
+:root {
+    --bg-color: #fffdf5; /* Warna dasar krem terang */
+    --dot-color: #ffe08a; /* Warna titik polkadot */
+    --primary-pink: #ff8b94; /* Warna pink utama judul */
+    --soft-pink: #ffc8dd;
+    --nav-bg: #ffffff;
+    --text-color: #5d576b;
+    --active-red: #ff6b6b; /* Warna tombol aktif (Desember di foto) */
+}
+
+body {
+    background-color: var(--bg-color);
+    /* Pola Polkadot seperti di gambar */
+    background-image: radial-gradient(var(--dot-color) 2px, transparent 2px);
+    background-size: 30px 30px;
+    font-family: 'Patrick Hand', cursive;
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* --- ANIMASI --- */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shine {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* --- HEADER JUDUL --- */
+.header-container {
+    text-align: center;
+    margin-top: 20px;
+    position: relative;
+}
+
+.main-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3.5rem;
+    color: var(--primary-pink);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 4px 4px 0px #fff, 6px 6px 0px #ffe08a;
+    animation: float 3s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Hiasan Bintang/Sparkle di samping judul */
+.sparkle {
+    display: inline-block;
+    color: #ffcc00;
+    font-size: 2.5rem;
+    position: relative;
+    top: -10px;
+    animation: shine 3s infinite linear;
+}
+
+/* --- KOTAK DESKRIPSI (Profile) --- */
+.description-box {
+    background: #fff;
+    border: 3px dashed var(--primary-pink);
+    border-radius: 50px; /* Membuat sudut tumpul seperti pil */
+    padding: 30px 40px;
+    max-width: 700px;
+    margin: 30px auto;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 0 rgba(255, 139, 148, 0.2);
+    transition: transform 0.3s;
+}
+
+.description-box:hover {
+    transform: scale(1.02) rotate(-1deg);
+}
+
+.profile-text {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* --- NAVIGASI BULAN (Bentuk Kapsul Panjang) --- */
+.month-nav-container {
+    background: var(--nav-bg);
+    border-radius: 50px;
+    padding: 10px 20px;
+    max-width: 900px;
+    margin: 0 auto 40px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    flex-wrap: nowrap;
+    overflow-x: auto; /* Agar aman di HP */
+}
+
+.month-btn {
+    background: transparent;
+    border: none;
+    color: #ccc; /* Warna abu-abu untuk bulan tidak aktif */
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.month-btn:hover {
+    color: var(--primary-pink);
+    transform: translateY(-2px);
+}
+
+/* Tombol Aktif (Seperti "Des" di gambar) */
+.month-btn.active {
+    background-color: var(--active-red);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+    transform: scale(1.1);
+    animation: pop 0.3s ease-out;
+}
+
+/* --- JUDUL BULAN (UPDATE: Warna Gelap & Outline Putih biar Jelas) --- */
+.current-month-title {
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 5rem; /* Ukuran Ekstra Besar */
+    
+    /* GANTI WARNA: Pakai Pink Kemerahan (bukan putih) */
+    color: #ff6b6b; 
+    
+    /* GANTI BAYANGAN: 
+       Lapis 1: Putih tebal (sebagai outline)
+       Lapis 2: Kuning 
+       Lapis 3: Biru 
+    */
+    text-shadow: 
+        4px 4px 0px #ffffff, 
+        8px 8px 0px #ffe08a,
+        12px 12px 0px #bde0fe;
+    
+    margin: 20px 0 40px 0;
+    letter-spacing: 2px;
+    transform: rotate(-3deg);
+    transition: all 0.3s;
+    
+    /* Animasi */
+    animation: popTitle 0.6s ease-out forwards;
+    cursor: default;
+}
+
+.current-month-title:hover {
+    transform: rotate(2deg) scale(1.1); /* Goyang ke kanan & membesar */
+    cursor: default;
+    /* Ubah urutan warna bayangan saat hover */
+    text-shadow: 
+        4px 4px 0px #bde0fe,
+        8px 8px 0px #ff8b94,
+        12px 12px 0px #ffe08a;
+}
+
+/* Tambahkan Keyframes ini di paling bawah CSS jika belum ada */
+@keyframes popTitle {
+    0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+    70% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(-3deg); opacity: 1; }
+}
+
+.gallery-grid {
+    display: flex; /* Pakai Flexbox */
+    flex-wrap: wrap; /* Agar foto turun ke bawah kalau penuh */
+    justify-content: center; /* KUNCI RATA TENGAH: Baris terakhir akan di tengah */
+    gap: 15px;
+    max-width: 950px;
+    margin: 0 auto;
+    padding-bottom: 50px;
+    
+    /* Setup transisi opacity untuk efek fade */
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Tambahkan lebar tetap pada slot foto agar rapi saat pakai Flexbox */
+.photo-slot {
+    width: 110px; /* Lebar fix */
+    aspect-ratio: 4/5;
+    background: white;
+    padding: 6px 6px 30px 6px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 4px;
+    
+    /* Animasi per-item saat muncul */
+    animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* --- CLASS TAMBAHAN UNTUK ANIMASI JS --- */
+.gallery-grid.fade-out {
+    opacity: 0;
+    transform: translateY(10px); /* Turun sedikit saat hilang */
+}
+
+.gallery-grid.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.photo-slot:hover { transform: scale(1.1) rotate(2deg) !important; z-index: 10; }
+.date-corner { position: absolute; top: -8px; right: -8px; background: var(--active-red); color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Fredoka One'; font-size: 0.8rem; border: 2px solid white; z-index: 10; }
+.slot-empty { background-color: var(--soft-pink); border: 2px dashed var(--active-red); }
+.slot-filled img { width: 100%; height: 100%; object-fit: cover; border: 1px solid #eee; }
+.caption-preview { position: absolute; bottom: 5px; width: 90%; text-align: center; font-size: 0.8rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* MODAL (Tetap sama) */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+.modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; border: 4px solid var(--primary-pink); }
+.modal-img-preview { width: 100%; max-height: 250px; object-fit: contain; display: none; margin-bottom: 10px; border-radius: 10px; }
+.input-caption { width: 100%; padding: 8px; margin: 10px 0; border: 2px solid var(--primary-pink); border-radius: 10px; outline: none; font-family: 'Patrick Hand'; }
+.btn-action { padding: 8px 20px; border: none; border-radius: 50px; cursor: pointer; font-family: 'Fredoka One'; margin: 5px; color: white; }
+.btn-save { background: #6c5ce7; } .btn-upload { background: var(--primary-pink); } .btn-delete { background: #ff6b6b; }
+.close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #aaa; }
+
+/* --- UPDATE KURSOR & SAKURA --- */
+
+/* 1. Ganti Kursor Standar dengan Kucing */
+body {
+    /* Pastikan file cursor.png sudah ada di folder dan ukurannya KECIL (32px/64px) */
+    cursor: url('cursor.png'), auto; 
+}
+
+/* Pastikan semua tombol juga pakai kursor kucing saat di-hover */
+button, .photo-slot, .month-btn, .current-month-title {
+    cursor: url('cursor.png'), pointer;
+}
+
+/* 2. Style Bunga Sakura */
+.sakura {
+    position: fixed;
+    top: -10px;
+    background-color: #ffc8dd; /* Warna Pink Sakura */
+    width: 15px;
+    height: 15px;
+    /* Membuat bentuk kelopak bunga (lancip di ujung) */
+    border-radius: 100% 0 100% 0; 
+    z-index: 1; /* Di atas background, tapi di belakang konten utama */
+    opacity: 0.6; /* Transparan */
+    pointer-events: none; /* Agar tidak menghalangi klik mouse */
+    animation: fall linear forwards;
+}
+
+/* Animasi Jatuh */
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    100% {
+        /* Jatuh ke bawah + Berputar + Goyang kanan/kiri */
+        transform: translateY(105vh) rotate(720deg) translateX(20px);
+        opacity: 0;
+    }
+}
