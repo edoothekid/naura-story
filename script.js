@@ -1,6 +1,6 @@
 // --- KONFIGURASI ---
-// GANTI DENGAN URL SCRIPT BARU KAMU HASIL DEPLOY ULANG
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1RykjHeefVzFooOBgOai3W64jCIFRS-Vfc3aPchoK7f3IwJx0b1TuvZegSXWUeiE5ag/exec"; 
+// GANTI DENGAN URL BARU HASIL DEPLOY TAHAP 1
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpSEnSoDcWCzqoViymqZu8zJ3DuICjClbzN6WGoh_mx-kbB66NPEK-Mwj0aZlRX5a30w/exec"; 
 
 const months = [
     { name: "Januari", days: 31 }, { name: "Februari", days: 28 },
@@ -15,7 +15,8 @@ let currentMonthIdx = 0;
 let activeDay = null;
 let tempBase64 = null;
 let currentFile = null;
-let allMemories = []; // Tempat menyimpan data yang ditarik dari Google Sheets
+let allMemories = []; 
+let isEditing = false; // Penanda apakah sedang edit atau upload baru
 
 const grid = document.getElementById('galleryGrid');
 const modal = document.getElementById('modalOverlay');
@@ -23,29 +24,23 @@ const statusText = document.getElementById('uploadStatus');
 const saveBtn = document.querySelector('.btn-save');
 const titleDisplay = document.getElementById('monthTitleDisplay');
 
-// Init saat halaman dimuat
-window.onload = () => {
-    fetchAllData(); // Tarik data dari internet dulu
-};
+// Init
+window.onload = () => { fetchAllData(); };
 
-// --- FUNGSI TARIK DATA (GET) ---
+// --- TARIK DATA ---
 function fetchAllData() {
-    // Tampilkan loading di judul bulan biar user tau
     if(titleDisplay) titleDisplay.innerText = "Loading...";
-    
     fetch(GOOGLE_SCRIPT_URL)
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-        allMemories = data; // Simpan data dari database
+        allMemories = data;
         renderNav();
         renderGrid();
         updateTitle();
-        
-        // Mulai hujan sakura setelah data siap
         setInterval(createSakura, 300);
     })
     .catch(err => {
-        console.error("Gagal ambil data:", err);
+        console.error(err);
         titleDisplay.innerText = "Error :(";
     });
 }
@@ -54,23 +49,18 @@ function updateTitle() {
     if(titleDisplay) titleDisplay.innerText = months[currentMonthIdx].name;
 }
 
-// --- RENDER NAVIGASI ---
+// --- RENDER NAV ---
 function renderNav() {
     const nav = document.getElementById('monthNav');
     nav.innerHTML = '';
-    
     months.forEach((m, i) => {
         const btn = document.createElement('button');
-        const shortName = m.name.substring(0, 3);
-        
         btn.className = `month-btn ${i === currentMonthIdx ? 'active' : ''}`;
-        btn.innerText = shortName;
-        
+        btn.innerText = m.name.substring(0, 3);
         btn.onclick = () => {
             if (i === currentMonthIdx) return;
             grid.classList.add('fade-out');
             titleDisplay.style.opacity = '0';
-
             setTimeout(() => {
                 currentMonthIdx = i;
                 renderNav();
@@ -88,31 +78,18 @@ function renderNav() {
 function renderGrid() {
     grid.innerHTML = '';
     const mData = months[currentMonthIdx];
-    const monthName = mData.name;
-    
     for (let d = 1; d <= mData.days; d++) {
-        // Cari apakah ada data di tanggal & bulan ini dari database
-        // Kita bandingkan string tanggal & bulan agar cocok
-        const memory = allMemories.find(m => m.month == monthName && m.date == d);
-
+        const memory = allMemories.find(m => m.month == mData.name && m.date == d);
         const slot = document.createElement('div');
         const rot = Math.floor(Math.random() * 5) - 2; 
         slot.style.transform = `rotate(${rot}deg)`;
-        
         const dateBadge = `<div class="date-corner">${d}</div>`;
 
         if (memory) {
-            // Jika data ditemukan
             slot.className = 'photo-slot slot-filled';
-            slot.innerHTML = `
-                ${dateBadge}
-                <img src="${memory.image}" alt="Foto">
-                <div class="caption-preview">${memory.caption || ""}</div>
-            `;
-            // Saat diklik, tampilkan modal view only (atau edit caption kalau mau ribet, tapi view only dulu biar aman)
+            slot.innerHTML = `${dateBadge}<img src="${memory.image}" alt="Foto"><div class="caption-preview">${memory.caption || ""}</div>`;
             slot.onclick = () => openModal(d, memory);
         } else {
-            // Jika kosong
             slot.className = 'photo-slot slot-empty';
             slot.innerHTML = `${dateBadge}<div style="font-size:2rem; opacity:0.3; color:#ff6b6b;">+</div>`;
             slot.onclick = () => openModal(d, null);
@@ -121,39 +98,46 @@ function renderGrid() {
     }
 }
 
-// --- MODAL ---
+// --- MODAL (BAGIAN PENTING YANG DIUBAH) ---
 function openModal(day, existingData) {
-    activeDay = day; tempBase64 = null; currentFile = null;
+    activeDay = day; 
+    tempBase64 = null; 
+    currentFile = null;
+    
     document.getElementById('modalTitle').innerText = `Tgl ${day} ${months[currentMonthIdx].name}`;
     document.getElementById('fileInput').value = ""; 
     const imgPreview = document.getElementById('previewImg');
     const captionInput = document.getElementById('captionInput');
     const btnChoose = document.getElementById('btnChooseFile');
-    const btnDelete = document.getElementById('btnDelete'); // Tombol hapus kita sembunyikan dulu di mode online
+    const btnDelete = document.getElementById('btnDelete');
     
     statusText.style.display = 'none';
     saveBtn.disabled = false;
     saveBtn.innerText = "Simpan";
-    btnDelete.style.display = 'none'; // Hapus di database agak rumit, kita matikan dulu fiturnya untuk keamanan
+
+    // --- PERUBAHAN DI SINI: BUKA SEMUA AKSES ---
+    captionInput.disabled = false; // Caption BISA diedit
+    btnChoose.style.display = 'inline-block'; // Tombol ganti foto MUNCUL
+    saveBtn.style.display = 'inline-block'; // Tombol simpan MUNCUL
 
     if (existingData) {
-        // Mode Lihat Detail
+        // Mode Edit
+        isEditing = true;
         imgPreview.src = existingData.image; 
         imgPreview.style.display = "block";
         captionInput.value = existingData.caption;
-        // Kalau sudah ada data, kita disable tombol simpan biar ga numpuk
-        btnChoose.style.display = 'none';
-        captionInput.disabled = true;
-        saveBtn.style.display = 'none';
+        
+        btnChoose.innerText = "Ganti Foto"; // Ubah teks tombol
+        btnDelete.style.display = 'inline-block'; // TOMBOL HAPUS MUNCUL
     } else {
-        // Mode Upload Baru
+        // Mode Baru
+        isEditing = false;
         imgPreview.style.display = "none"; 
         imgPreview.src = "";
         captionInput.value = "";
-        captionInput.disabled = false;
-        btnChoose.style.display = 'inline-block';
+        
         btnChoose.innerText = "📸 Pilih Foto";
-        saveBtn.style.display = 'inline-block';
+        btnDelete.style.display = 'none'; // Tombol hapus sembunyi
     }
     modal.style.display = "flex";
 }
@@ -173,54 +157,72 @@ function handleFileSelect(input) {
     }
 }
 
-// --- SIMPAN KE DATABASE (POST) ---
+// --- SIMPAN / UPDATE ---
 function saveData() {
-    if (!tempBase64 || !currentFile) {
+    // Validasi: Kalau mode baru, wajib ada foto. Kalau mode edit, foto boleh kosong (pakai lama).
+    if (!isEditing && !tempBase64) {
         alert("Pilih foto dulu ya! 😋");
         return;
     }
     
     statusText.style.display = 'block';
-    statusText.innerText = "Sedang mengirim ke Database Naura... ⏳";
+    statusText.innerText = isEditing ? "Mengupdate data... ⏳" : "Mengupload kenangan... ⏳";
     saveBtn.disabled = true;
 
     const payload = {
-        month: months[currentMonthIdx].name, // Kirim Nama Bulan
-        date: activeDay,                     // Kirim Tanggal
-        image: tempBase64,
-        mimeType: currentFile.type,
-        filename: `Naura_${months[currentMonthIdx].name}_${activeDay}`,
-        caption: document.getElementById('captionInput').value
+        action: 'save', // Beritahu server ini perintah simpan
+        month: months[currentMonthIdx].name,
+        date: activeDay,
+        caption: document.getElementById('captionInput').value,
+        // Kirim data gambar HANYA jika user memilih file baru
+        image: tempBase64, 
+        mimeType: currentFile ? currentFile.type : null,
+        filename: `Naura_${months[currentMonthIdx].name}_${activeDay}`
     };
 
+    sendRequest(payload);
+}
+
+// --- HAPUS DATA ---
+function deleteData() {
+    if(confirm("Yakin mau hapus kenangan ini? 😢")) {
+        statusText.style.display = 'block';
+        statusText.innerText = "Menghapus kenangan... 🗑️";
+        
+        const payload = {
+            action: 'delete', // Beritahu server ini perintah hapus
+            month: months[currentMonthIdx].name,
+            date: activeDay
+        };
+        sendRequest(payload);
+    }
+}
+
+// --- FUNGSI KIRIM REQUEST KE SERVER ---
+function sendRequest(payload) {
     fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        // Hapus mode 'no-cors' agar kita bisa baca respon JSON sukses/gagal
-        // Google Script harus di-return sebagai JSON
         body: JSON.stringify(payload)
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(result => {
         if(result.status === 'success') {
-            alert("Berhasil masuk Database! 🎉");
-            // Refresh data agar foto baru muncul
+            alert(result.message);
             closeModal();
-            fetchAllData(); 
+            fetchAllData(); // Refresh data otomatis
         } else {
-            alert("Gagal menyimpan: " + result.message);
+            alert("Gagal: " + result.message);
             saveBtn.disabled = false;
         }
     })
     .catch(err => {
-        // Fallback kalau error jaringan
         console.error(err);
-        alert("Upload terkirim! (Refresh halaman jika belum muncul) ✅");
+        alert("Proses selesai (Cek hasilnya)."); // Fallback jika no-cors issues
         closeModal();
-        fetchAllData(); 
+        fetchAllData();
     });
 }
 
-// --- SAKURA ANIMATION ---
 function createSakura() {
     const sakura = document.createElement('div');
     sakura.classList.add('sakura');
