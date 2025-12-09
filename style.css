@@ -238,14 +238,13 @@ body {
 
 /* --- UPDATE KURSOR & SAKURA --- */
 
-/* 1. Ganti Kursor Standar dengan Kucing */
 body {
-    /* Pastikan file cursor.png sudah ada di folder dan ukurannya KECIL (32px/64px) */
+    /* Pastikan file cursor.png ada di folder yang sama dengan index.html */
     cursor: url('cursor.png'), auto; 
 }
 
-/* Pastikan semua tombol juga pakai kursor kucing saat di-hover */
-button, .photo-slot, .month-btn, .current-month-title {
+/* Agar tombol juga pakai kursor kucing */
+button, .photo-slot, .month-btn, .current-month-title, a {
     cursor: url('cursor.png'), pointer;
 }
 

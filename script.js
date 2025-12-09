@@ -1,6 +1,6 @@
 // --- KONFIGURASI ---
 // GANTI DENGAN URL SCRIPT BARU KAMU HASIL DEPLOY ULANG
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLLIqeUwLWOZ7PwCzAzwRCvnqD-KHGXyynOFZyCabtpdWaz4erjRZgIvvQkbiw-xcNHQ/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1RykjHeefVzFooOBgOai3W64jCIFRS-Vfc3aPchoK7f3IwJx0b1TuvZegSXWUeiE5ag/exec"; 
 
 const months = [
     { name: "Januari", days: 31 }, { name: "Februari", days: 28 },
