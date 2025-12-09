@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galery Dump Naura ✨</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Patrick+Hand&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="loadingScreen">
+        <div class="loading-icon">🌸</div>
+        <p>Sedang menyiapkan kenangan...</p>
+    </div>
 
     <div class="header-container">
         <div class="sparkle">✨</div>
@@ -34,10 +41,13 @@
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h2 id="modalTitle">Edit Memori 📝</h2>
+            
             <img id="previewImg" class="modal-img-preview">
+            
             <button id="btnChooseFile" class="btn-action btn-upload" onclick="document.getElementById('fileInput').click()">📸 Pilih Foto</button>
             <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
-            <input type="text" id="captionInput" class="input-caption" placeholder="Tulis caption lucu...">
+            
+            <textarea id="captionInput" class="input-caption" placeholder="Tulis caption lucu..." rows="3"></textarea>
             
             <div id="uploadStatus" style="display:none; color:#ff6b6b; font-size:0.9rem; font-weight:bold; margin-top:5px;">
                 Upload ke Drive... ⏳
@@ -48,6 +58,13 @@
                 <button id="btnDelete" class="btn-action btn-delete" onclick="deleteData()" style="display:none;">Hapus</button>
             </div>
         </div>
+    </div>
+
+    <div class="music-container">
+        <audio id="bgMusic" loop>
+            <source src="lagu.mp3" type="audio/mpeg">
+        </audio>
+        <button id="musicBtn" onclick="toggleMusic()">🎵</button>
     </div>
 
     <script src="script.js"></script>

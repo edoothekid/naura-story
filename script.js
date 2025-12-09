@@ -1,5 +1,4 @@
 // --- KONFIGURASI ---
-// GANTI DENGAN URL BARU HASIL DEPLOY TAHAP 1
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpSEnSoDcWCzqoViymqZu8zJ3DuICjClbzN6WGoh_mx-kbB66NPEK-Mwj0aZlRX5a30w/exec"; 
 
 const months = [
@@ -16,20 +15,20 @@ let activeDay = null;
 let tempBase64 = null;
 let currentFile = null;
 let allMemories = []; 
-let isEditing = false; // Penanda apakah sedang edit atau upload baru
+let isEditing = false;
 
 const grid = document.getElementById('galleryGrid');
 const modal = document.getElementById('modalOverlay');
 const statusText = document.getElementById('uploadStatus');
 const saveBtn = document.querySelector('.btn-save');
 const titleDisplay = document.getElementById('monthTitleDisplay');
+const loadingScreen = document.getElementById('loadingScreen');
 
 // Init
 window.onload = () => { fetchAllData(); };
 
 // --- TARIK DATA ---
 function fetchAllData() {
-    if(titleDisplay) titleDisplay.innerText = "Loading...";
     fetch(GOOGLE_SCRIPT_URL)
     .then(r => r.json())
     .then(data => {
@@ -38,10 +37,17 @@ function fetchAllData() {
         renderGrid();
         updateTitle();
         setInterval(createSakura, 300);
+        
+        // HILANGKAN LOADING SCREEN KETIKA DATA SUDAH SIAP
+        if(loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
     })
     .catch(err => {
         console.error(err);
-        titleDisplay.innerText = "Error :(";
+        if(loadingScreen) {
+            loadingScreen.innerHTML = "<p style='color:red'>Gagal memuat data :(</p>";
+        }
     });
 }
 
@@ -87,7 +93,11 @@ function renderGrid() {
 
         if (memory) {
             slot.className = 'photo-slot slot-filled';
-            slot.innerHTML = `${dateBadge}<img src="${memory.image}" alt="Foto"><div class="caption-preview">${memory.caption || ""}</div>`;
+            slot.innerHTML = `
+                ${dateBadge}
+                <img src="${memory.image}" alt="Foto">
+                <div class="caption-preview">${memory.caption || ""}</div>
+            `;
             slot.onclick = () => openModal(d, memory);
         } else {
             slot.className = 'photo-slot slot-empty';
@@ -98,7 +108,7 @@ function renderGrid() {
     }
 }
 
-// --- MODAL (BAGIAN PENTING YANG DIUBAH) ---
+// --- MODAL ---
 function openModal(day, existingData) {
     activeDay = day; 
     tempBase64 = null; 
@@ -115,29 +125,24 @@ function openModal(day, existingData) {
     saveBtn.disabled = false;
     saveBtn.innerText = "Simpan";
 
-    // --- PERUBAHAN DI SINI: BUKA SEMUA AKSES ---
-    captionInput.disabled = false; // Caption BISA diedit
-    btnChoose.style.display = 'inline-block'; // Tombol ganti foto MUNCUL
-    saveBtn.style.display = 'inline-block'; // Tombol simpan MUNCUL
+    captionInput.disabled = false; 
+    btnChoose.style.display = 'inline-block'; 
+    saveBtn.style.display = 'inline-block'; 
 
     if (existingData) {
-        // Mode Edit
         isEditing = true;
         imgPreview.src = existingData.image; 
         imgPreview.style.display = "block";
         captionInput.value = existingData.caption;
-        
-        btnChoose.innerText = "Ganti Foto"; // Ubah teks tombol
-        btnDelete.style.display = 'inline-block'; // TOMBOL HAPUS MUNCUL
+        btnChoose.innerText = "Ganti Foto"; 
+        btnDelete.style.display = 'inline-block'; 
     } else {
-        // Mode Baru
         isEditing = false;
         imgPreview.style.display = "none"; 
         imgPreview.src = "";
         captionInput.value = "";
-        
         btnChoose.innerText = "📸 Pilih Foto";
-        btnDelete.style.display = 'none'; // Tombol hapus sembunyi
+        btnDelete.style.display = 'none'; 
     }
     modal.style.display = "flex";
 }
@@ -157,40 +162,35 @@ function handleFileSelect(input) {
     }
 }
 
-// --- SIMPAN / UPDATE ---
+// --- SIMPAN ---
 function saveData() {
-    // Validasi: Kalau mode baru, wajib ada foto. Kalau mode edit, foto boleh kosong (pakai lama).
     if (!isEditing && !tempBase64) {
         alert("Pilih foto dulu ya! 😋");
         return;
     }
-    
     statusText.style.display = 'block';
     statusText.innerText = isEditing ? "Mengupdate data... ⏳" : "Mengupload kenangan... ⏳";
     saveBtn.disabled = true;
 
     const payload = {
-        action: 'save', // Beritahu server ini perintah simpan
+        action: 'save', 
         month: months[currentMonthIdx].name,
         date: activeDay,
         caption: document.getElementById('captionInput').value,
-        // Kirim data gambar HANYA jika user memilih file baru
         image: tempBase64, 
         mimeType: currentFile ? currentFile.type : null,
         filename: `Naura_${months[currentMonthIdx].name}_${activeDay}`
     };
-
     sendRequest(payload);
 }
 
-// --- HAPUS DATA ---
+// --- HAPUS ---
 function deleteData() {
     if(confirm("Yakin mau hapus kenangan ini? 😢")) {
         statusText.style.display = 'block';
         statusText.innerText = "Menghapus kenangan... 🗑️";
-        
         const payload = {
-            action: 'delete', // Beritahu server ini perintah hapus
+            action: 'delete',
             month: months[currentMonthIdx].name,
             date: activeDay
         };
@@ -198,7 +198,6 @@ function deleteData() {
     }
 }
 
-// --- FUNGSI KIRIM REQUEST KE SERVER ---
 function sendRequest(payload) {
     fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
@@ -209,7 +208,7 @@ function sendRequest(payload) {
         if(result.status === 'success') {
             alert(result.message);
             closeModal();
-            fetchAllData(); // Refresh data otomatis
+            fetchAllData(); 
         } else {
             alert("Gagal: " + result.message);
             saveBtn.disabled = false;
@@ -217,12 +216,13 @@ function sendRequest(payload) {
     })
     .catch(err => {
         console.error(err);
-        alert("Proses selesai (Cek hasilnya)."); // Fallback jika no-cors issues
+        alert("Proses selesai (Cek hasilnya)."); 
         closeModal();
         fetchAllData();
     });
 }
 
+// --- SAKURA ---
 function createSakura() {
     const sakura = document.createElement('div');
     sakura.classList.add('sakura');
@@ -232,6 +232,24 @@ function createSakura() {
     sakura.style.width = size; sakura.style.height = size;
     document.body.appendChild(sakura);
     setTimeout(() => { sakura.remove(); }, 10000);
+}
+
+// --- MUSIK ---
+const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let isPlaying = false;
+
+function toggleMusic() {
+    if (isPlaying) {
+        music.pause();
+        musicBtn.classList.remove('music-spin');
+        musicBtn.innerText = "🎵";
+    } else {
+        music.play();
+        musicBtn.classList.add('music-spin');
+        musicBtn.innerText = "💿";
+    }
+    isPlaying = !isPlaying;
 }
 
 window.onclick = function(event) { if (event.target == modal) closeModal(); }
