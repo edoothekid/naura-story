@@ -1,5 +1,5 @@
 // --- KONFIGURASI ---
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpSEnSoDcWCzqoViymqZu8zJ3DuICjClbzN6WGoh_mx-kbB66NPEK-Mwj0aZlRX5a30w/exec"; 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwq7nqgH2YshtOOcDgS_KlXquELaFgdyym4NVJH3o_v62itSUkid7Cb4hOnyHgdZpIIxw/exec"; 
 
 const months = [
     { name: "Januari", days: 31 }, { name: "Februari", days: 28 },
@@ -10,6 +10,7 @@ const months = [
     { name: "November", days: 30 }, { name: "Desember", days: 31 }
 ];
 
+let currentYear = 2026; 
 let currentMonthIdx = 0;
 let activeDay = null;
 let tempBase64 = null;
@@ -19,13 +20,26 @@ let isEditing = false;
 
 const grid = document.getElementById('galleryGrid');
 const modal = document.getElementById('modalOverlay');
+const letterModal = document.getElementById('letterModal');
 const statusText = document.getElementById('uploadStatus');
 const saveBtn = document.querySelector('.btn-save');
 const titleDisplay = document.getElementById('monthTitleDisplay');
 const loadingScreen = document.getElementById('loadingScreen');
+const scrollBtn = document.getElementById("scrollToTopBtn");
 
 // Init
-window.onload = () => { fetchAllData(); };
+window.onload = () => { 
+    fetchAllData(); 
+};
+
+// --- FUNGSI GANTI TAHUN ---
+function changeYear(year) {
+    currentYear = year;
+    document.getElementById('btn2025').classList.remove('active');
+    document.getElementById('btn2026').classList.remove('active');
+    document.getElementById(`btn${year}`).classList.add('active');
+    renderGrid();
+}
 
 // --- TARIK DATA ---
 function fetchAllData() {
@@ -37,17 +51,11 @@ function fetchAllData() {
         renderGrid();
         updateTitle();
         setInterval(createSakura, 300);
-        
-        // HILANGKAN LOADING SCREEN KETIKA DATA SUDAH SIAP
-        if(loadingScreen) {
-            loadingScreen.style.display = 'none';
-        }
+        if(loadingScreen) loadingScreen.style.display = 'none';
     })
     .catch(err => {
         console.error(err);
-        if(loadingScreen) {
-            loadingScreen.innerHTML = "<p style='color:red'>Gagal memuat data :(</p>";
-        }
+        if(loadingScreen) loadingScreen.innerHTML = "<p style='color:red'>Gagal memuat data :(</p>";
     });
 }
 
@@ -85,7 +93,7 @@ function renderGrid() {
     grid.innerHTML = '';
     const mData = months[currentMonthIdx];
     for (let d = 1; d <= mData.days; d++) {
-        const memory = allMemories.find(m => m.month == mData.name && m.date == d);
+        const memory = allMemories.find(m => m.year == currentYear && m.month == mData.name && m.date == d);
         const slot = document.createElement('div');
         const rot = Math.floor(Math.random() * 5) - 2; 
         slot.style.transform = `rotate(${rot}deg)`;
@@ -114,7 +122,7 @@ function openModal(day, existingData) {
     tempBase64 = null; 
     currentFile = null;
     
-    document.getElementById('modalTitle').innerText = `Tgl ${day} ${months[currentMonthIdx].name}`;
+    document.getElementById('modalTitle').innerText = `Tgl ${day} ${months[currentMonthIdx].name} ${currentYear}`;
     document.getElementById('fileInput').value = ""; 
     const imgPreview = document.getElementById('previewImg');
     const captionInput = document.getElementById('captionInput');
@@ -124,7 +132,6 @@ function openModal(day, existingData) {
     statusText.style.display = 'none';
     saveBtn.disabled = false;
     saveBtn.innerText = "Simpan";
-
     captionInput.disabled = false; 
     btnChoose.style.display = 'inline-block'; 
     saveBtn.style.display = 'inline-block'; 
@@ -148,6 +155,15 @@ function openModal(day, existingData) {
 }
 
 function closeModal() { modal.style.display = "none"; }
+
+// --- LOGIKA SURAT RAHASIA ---
+function openLetter() {
+    letterModal.style.display = "flex";
+}
+
+function closeLetter() {
+    letterModal.style.display = "none";
+}
 
 function handleFileSelect(input) {
     if (input.files && input.files[0]) {
@@ -174,12 +190,13 @@ function saveData() {
 
     const payload = {
         action: 'save', 
+        year: currentYear, 
         month: months[currentMonthIdx].name,
         date: activeDay,
         caption: document.getElementById('captionInput').value,
         image: tempBase64, 
         mimeType: currentFile ? currentFile.type : null,
-        filename: `Naura_${months[currentMonthIdx].name}_${activeDay}`
+        filename: `Naura_${currentYear}_${months[currentMonthIdx].name}_${activeDay}`
     };
     sendRequest(payload);
 }
@@ -191,6 +208,7 @@ function deleteData() {
         statusText.innerText = "Menghapus kenangan... 🗑️";
         const payload = {
             action: 'delete',
+            year: currentYear, 
             month: months[currentMonthIdx].name,
             date: activeDay
         };
@@ -252,4 +270,24 @@ function toggleMusic() {
     isPlaying = !isPlaying;
 }
 
-window.onclick = function(event) { if (event.target == modal) closeModal(); }
+// --- SCROLL TO TOP ---
+window.onscroll = function() {
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        scrollBtn.style.display = "block";
+    } else {
+        scrollBtn.style.display = "none";
+    }
+};
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+// --- TUTUP MODAL SAAT KLIK LUAR ---
+window.onclick = function(event) {
+    if (event.target == modal) closeModal();
+    if (event.target == letterModal) closeLetter();
+}

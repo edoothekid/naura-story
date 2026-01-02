@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galery Dump Naura ✨</title>
+    
+    <link rel="icon" href="icon.png" type="image/png">
+    
+    <title>Naura's Archive</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Patrick+Hand&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,17 +20,27 @@
 
     <div class="header-container">
         <div class="sparkle">✨</div>
-        <h1 class="main-title">GALERY DUMP NAURA</h1>
+        <h1 class="main-title">All About Naura</h1>
         <div class="sparkle">✨</div>
     </div>
 
     <div class="description-box">
         <div class="profile-text">
-            Jadi, Naura adalah... Bocil kelahiran Jakarta tapi malah ngaku orang Bogor, 
-            padahal bagus ya kalau jadi anak Ibukota, dia suka bobo tiap waktu, 
-            dimanapun tempatnya pokonya bobo terus, dia juga jarang makan, 
-            sekarang dia sedang sibuk dengan Stranger Thingsnya 🚲👻
+            Naura Ayu Bambina Astri, kelahiran Jakarta yang kini menjalani hidup di Bogor. 
+            Sehari-harinya benar-benar sibuk dengan dunianya sendiri. 
+            Waktunya habis terbagi untuk tidur di berbagai kesempatan, sering lupa makan, 
+            dan fokus menuntaskan Stranger Things. 
+            Pokoknya jadwalnya sangat padat dengan agendanya itu.
         </div>
+    </div>
+
+    <div class="year-selector-container">
+        <button class="year-btn" onclick="changeYear(2025)" id="btn2025">
+            2025
+        </button>
+        <button class="year-btn active" onclick="changeYear(2026)" id="btn2026">
+            2026
+        </button>
     </div>
 
     <div class="month-nav-container" id="monthNav"></div>
@@ -44,7 +56,9 @@
             
             <img id="previewImg" class="modal-img-preview">
             
-            <button id="btnChooseFile" class="btn-action btn-upload" onclick="document.getElementById('fileInput').click()">📸 Pilih Foto</button>
+            <button id="btnChooseFile" class="btn-action btn-upload" onclick="document.getElementById('fileInput').click()">
+                📸 Pilih Foto
+            </button>
             <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
             
             <textarea id="captionInput" class="input-caption" placeholder="Tulis caption lucu..." rows="3"></textarea>
@@ -60,12 +74,44 @@
         </div>
     </div>
 
+    <button id="letterBtn" onclick="openLetter()">💌</button>
+
+<div class="modal-overlay" id="letterModal">
+        <div class="modal-box letter-box">
+            <span class="close-btn" onclick="closeLetter()">&times;</span>
+            <h2>Untuk Naura,</h2>
+            <div class="letter-content">
+                <p>Hai Naura! 👋</p>
+                <p>
+                    Web ini sengaja dibuat buat ngumpulin kepingan memori random kamu. 
+                    Mungkin isinya banyak foto gak jelas atau blur, tapi itu semua berharga.
+                </p>
+                <p>
+                    Jadi, kalau nanti kamu lagi ngerasa sedih, capek, atau bingung mau ngapain, 
+                    coba buka web ini sebentar. Lihat lagi betapa serunya hal-hal yang udah kamu lewatin.
+                </p>
+                <p>
+                    Biar kamu inget, kalau di balik hari-hari sibukmu itu, 
+                    <b>banyak banget momen kecil yang bikin bahagia.</b>
+                </p>
+                <br>
+                <p style="text-align: right;"><b>^_^</b></p>
+            </div>
+        </div>
+    </div>
+
+    <button id="scrollToTopBtn" onclick="scrollToTop()">⬆️</button>
+
     <div class="music-container">
         <audio id="bgMusic" loop>
             <source src="lagu.mp3" type="audio/mpeg">
         </audio>
         <button id="musicBtn" onclick="toggleMusic()">🎵</button>
     </div>
+
+    <footer>
+        <p style="font-size: 0.8rem;">© 2026 Naura's Archive</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
