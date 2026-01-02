@@ -25,7 +25,6 @@ const statusText = document.getElementById('uploadStatus');
 const saveBtn = document.querySelector('.btn-save');
 const titleDisplay = document.getElementById('monthTitleDisplay');
 const loadingScreen = document.getElementById('loadingScreen');
-const scrollBtn = document.getElementById("scrollToTopBtn");
 
 // Init
 window.onload = () => { 
@@ -51,7 +50,13 @@ function fetchAllData() {
         renderGrid();
         updateTitle();
         setInterval(createSakura, 300);
+        
+        // --- LOGIKA HILANGKAN LOADING & MUNCULKAN SURAT ---
         if(loadingScreen) loadingScreen.style.display = 'none';
+        
+        // Ini kuncinya: Ubah display surat dari 'none' (CSS) jadi 'flex' (JS)
+        const letterBtn = document.getElementById('letterBtn');
+        if(letterBtn) letterBtn.style.display = 'flex';
     })
     .catch(err => {
         console.error(err);
@@ -268,22 +273,6 @@ function toggleMusic() {
         musicBtn.innerText = "💿";
     }
     isPlaying = !isPlaying;
-}
-
-// --- SCROLL TO TOP ---
-window.onscroll = function() {
-    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-        scrollBtn.style.display = "block";
-    } else {
-        scrollBtn.style.display = "none";
-    }
-};
-
-function scrollToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 }
 
 // --- TUTUP MODAL SAAT KLIK LUAR ---

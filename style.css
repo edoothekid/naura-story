@@ -30,8 +30,7 @@ button,
 a, 
 #musicBtn,
 .year-btn,
-#letterBtn,
-#scrollToTopBtn {
+#letterBtn {
     cursor: url('cursor.png'), pointer;
 }
 
@@ -116,13 +115,18 @@ a,
 
 /* --- 7. PILIH TAHUN (EFEK KACA) --- */
 .year-selector-container {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
     margin-bottom: 20px;
     position: relative;
     z-index: 55;
 }
 
 .year-btn {
+    margin: 0;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(5px);
     border: 2px solid var(--primary-pink);
@@ -131,7 +135,6 @@ a,
     border-radius: 20px;
     font-family: 'Fredoka One', cursive;
     font-size: 1.2rem;
-    margin: 0 10px;
     transition: 0.3s;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
@@ -392,11 +395,11 @@ a,
     color: #aaa;
 }
 
-/* --- 14. SURAT RAHASIA (BARU) --- */
+/* --- 14. SURAT RAHASIA --- */
 #letterBtn {
     position: fixed;
     bottom: 20px;
-    left: 80px; /* Di sebelah tombol musik */
+    left: 80px; 
     width: 50px;
     height: 50px;
     background: #fff;
@@ -407,6 +410,11 @@ a,
     z-index: 1000;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
+    
+    /* --- INI KUNCINYA: DISEMBUNYIKAN SAAT AWAL --- */
+    display: none; 
+    align-items: center;
+    justify-content: center;
 }
 
 #letterBtn:hover {
@@ -435,40 +443,18 @@ a,
     margin-bottom: 10px;
 }
 
-/* --- 15. TOMBOL SCROLL TO TOP --- */
-#scrollToTopBtn {
-    display: none;
-    position: fixed;
-    bottom: 80px; 
-    right: 20px; 
-    z-index: 990;
-    font-size: 1.5rem;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(5px);
-    border: 2px solid var(--primary-pink);
-    color: var(--primary-pink);
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-#scrollToTopBtn:hover {
-    background: var(--primary-pink);
-    color: white;
-    transform: translateY(-5px);
-}
-
 /* --- 16. FOOTER --- */
 footer {
     text-align: center;
     margin-top: 50px;
-    padding: 20px;
+    padding-top: 20px;
+    padding-bottom: 120px;
     color: #888;
     font-size: 0.9rem;
     font-family: 'Fredoka One', cursive;
     border-top: 2px dashed var(--soft-pink);
+    position: relative;
+    width: 100%;
 }
 
 footer p {
